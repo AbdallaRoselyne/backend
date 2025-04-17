@@ -1,13 +1,14 @@
 // 1. FIRST THING - Load environment variables with explicit path and verification
 const path = require('path');
 const dotenv = require('dotenv');
+const fs = require('fs');
 
-// Load from different possible locations
+// Load environment variables
 const envPath = path.join(__dirname, '.env');
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
-  console.warn('⚠️  Local .env file not found or is empty - relying on Railway environment variables');
+  console.warn('⚠️  Local .env file not found - relying on Railway environment variables');
 } else {
   console.log('✅ Local .env file loaded successfully');
 }
@@ -16,13 +17,15 @@ if (result.error) {
 console.log('🔍 Environment Variables Verification:', {
   MONGO_URI: process.env.MONGO_URI ? '✅ Loaded' : '❌ MISSING',
   PORT: process.env.PORT || '⚠️  Using default (8080)',
-  NODE_ENV: process.env.NODE_ENV || '⚠️  Not set (defaulting to development)'
+  NODE_ENV: process.env.NODE_ENV || '⚠️  Not set (defaulting to development)',
+  CLIENT_URL: process.env.CLIENT_URL || '⚠️  Not set'
 });
 
 // 3. Now load other dependencies
 const express = require('express');
 const cors = require('cors');
 const WebSocket = require('ws');
+const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 
 // Route imports
@@ -43,7 +46,7 @@ const app = express();
     console.log('🟢 Database connection established');
   } catch (dbError) {
     console.error('🔴 FATAL: Database connection failed:', dbError.message);
-    console.log('⏳ Attempting to continue (some features may not work)');
+    process.exit(1); // Exit if DB connection fails
   }
 })();
 
@@ -77,26 +80,24 @@ app.options('*', cors(corsOptions));
 // Middleware
 app.use(express.json());
 
+// API Root Endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: "Backend API is running",
+    status: "healthy",
+    dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API Routes
-app.use("/", authRoutes);
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
 app.use('/api/requests', requestsRoutes);
 app.use('/api/tasks', tasksRoutes);
 app.use('/api/tasks', completionsRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/members', membersRoutes);
 app.use('/api/completions', completionsRoutes);
-
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../front-end/build');
-  app.use(express.static(frontendPath));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-  console.log('🚀 Production mode: Serving static frontend files');
-}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
