@@ -24,7 +24,7 @@ const allowedOrigins = [
   'http://localhost:3000', 
   process.env.CLIENT_URL, 
   'https://frontend-production-f39d.up.railway.app' 
-].filter(Boolean); // Remove any undefined/null values
+].filter(Boolean); 
 
 const corsOptions = {
   origin: function (origin, callback) {
