@@ -1,14 +1,14 @@
+const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
-const fs = require('fs');
 
 const envPath = path.join(__dirname, '.env');
-const result = dotenv.config({ path: envPath });
 
-if (result.error) {
-  console.warn('Local .env file not found - relying on Railway environment variables');
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  console.log('Local .env file loaded');
 } else {
-  console.log('Local .env file loaded successfully');
+  console.log('Local .env not found - relying on Railway environment variables');
 }
 
 console.log('🔍 Environment Variables Verification:', {
