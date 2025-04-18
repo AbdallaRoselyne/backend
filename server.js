@@ -1,27 +1,23 @@
-// 1. FIRST THING - Load environment variables with explicit path and verification
 const path = require('path');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-// Load environment variables
 const envPath = path.join(__dirname, '.env');
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
-  console.warn('⚠️  Local .env file not found - relying on Railway environment variables');
+  console.warn('Local .env file not found - relying on Railway environment variables');
 } else {
-  console.log('✅ Local .env file loaded successfully');
+  console.log('Local .env file loaded successfully');
 }
 
-// 2. Immediately verify critical variables
 console.log('🔍 Environment Variables Verification:', {
-  MONGO_URI: process.env.MONGO_URI ? '✅ Loaded' : '❌ MISSING',
-  PORT: process.env.PORT || '⚠️  Using default (8080)',
-  NODE_ENV: process.env.NODE_ENV || '⚠️  Not set (defaulting to development)',
-  CLIENT_URL: process.env.CLIENT_URL || '⚠️  Not set'
+  MONGO_URI: process.env.MONGO_URI ? 'Loaded' : 'MISSING',
+  PORT: process.env.PORT || 'Using default (8080)',
+  NODE_ENV: process.env.NODE_ENV || 'Not set (defaulting to development)',
+  CLIENT_URL: process.env.CLIENT_URL || 'Not set'
 });
 
-// 3. Now load other dependencies
 const express = require('express');
 const cors = require('cors');
 const WebSocket = require('ws');
@@ -36,28 +32,26 @@ const requestsRoutes = require('./routes/requests');
 const membersRoutes = require('./routes/members');
 const completionsRoutes = require('./routes/taskCompletion');
 
-// Initialize Express app
 const app = express();
 
-// 4. Connect to database with error handling
 (async () => {
   try {
     await connectDB();
-    console.log('🟢 Database connection established');
+    console.log('Database connection established');
   } catch (dbError) {
-    console.error('🔴 FATAL: Database connection failed:', dbError.message);
-    process.exit(1); // Exit if DB connection fails
+    console.error('FATAL: Database connection failed:', dbError.message);
+    process.exit(1); 
   }
 })();
 
-// Enhanced CORS configuration
+//CORS configuration
 const allowedOrigins = [
   'http://localhost:3000', 
   process.env.CLIENT_URL, 
   'https://frontend-production-f39d.up.railway.app'
 ].filter(Boolean); 
 
-console.log('🌐 Allowed CORS Origins:', allowedOrigins);
+console.log('Allowed CORS Origins:', allowedOrigins);
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -65,7 +59,7 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.warn('🚫 Blocked CORS request from:', origin);
+      console.warn('Blocked CORS request from:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -109,11 +103,14 @@ app.get('/health', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 8080;
-const server = app.listen(PORT, () => {
-  console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`🔗 Allowed origins: ${allowedOrigins.join(', ')}`);
-  console.log(`⚙️  Environment: ${process.env.NODE_ENV || 'development'}\n`);
-});
+const HOST = '0.0.0.0'; 
+
+const server = app.listen(PORT, HOST, () => {
+  console.log(`\n Server running on http://${HOST}:${PORT}`);
+  console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}\n`);
+}
+);
 
 // WebSocket Server with enhanced logging
 const wss = new WebSocket.Server({ server });
