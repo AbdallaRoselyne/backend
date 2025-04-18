@@ -2,21 +2,20 @@ const path = require('path');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-// const envPath = path.join(__dirname, '.env');
-// const result = dotenv.config({ path: envPath });
+const envPath = path.join(__dirname, '.env');
+const result = dotenv.config({ path: envPath });
 
-// if (result.error) {
-//   console.warn('Local .env file not found - relying on Railway environment variables');
-// } else {
-//   console.log('Local .env file loaded successfully');
-// }
+if (result.error) {
+  console.warn('Local .env file not found - relying on Railway environment variables');
+} else {
+  console.log('Local .env file loaded successfully');
+}
 
 console.log('🔍 Environment Variables Verification:', {
   MONGO_URI: process.env.MONGO_URI ? 'Loaded' : 'MISSING',
   JWT_SECRET: process.env.JWT_SECRET ? 'Loaded' : 'MISSING',
   PORT: process.env.PORT || 'Using default (8080)',
   NODE_ENV: process.env.NODE_ENV || 'Not set (defaulting to development)',
-  CLIENT_URL: process.env.CLIENT_URL || 'Not set'
 });
 
 const express = require('express');
