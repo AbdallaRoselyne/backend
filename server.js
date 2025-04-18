@@ -13,6 +13,7 @@ if (result.error) {
 
 console.log('🔍 Environment Variables Verification:', {
   MONGO_URI: process.env.MONGO_URI ? 'Loaded' : 'MISSING',
+  JWT_SECRET: process.env.JWT_SECRET ? 'Loaded' : 'MISSING',
   PORT: process.env.PORT || 'Using default (8080)',
   NODE_ENV: process.env.NODE_ENV || 'Not set (defaulting to development)',
   CLIENT_URL: process.env.CLIENT_URL || 'Not set'
@@ -135,7 +136,7 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
-    console.log('➖ WebSocket client disconnected');
+    console.log('WebSocket client disconnected');
   });
 });
 
@@ -154,7 +155,7 @@ server.on('upgrade', (request, socket, head) => {
 
 // Handle shutdown gracefully
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM received - shutting down gracefully');
+  console.log('SIGTERM received - shutting down gracefully');
   server.close(() => {
     console.log('💤 Server closed');
     process.exit(0);

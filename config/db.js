@@ -1,22 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const connectDB = async () => {
-  // Fallback URI for development
-  const defaultUri = "mongodb+srv://farahnaz:%40Roselyne44@project-planner.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000";
-  
-  const connectionUri = process.env.MONGO_URI || defaultUri;
-
-  console.log('🔗 Attempting to connect with URI:', 
-    connectionUri.includes('@') 
-      ? connectionUri.replace(/^(.*?:\/\/)([^:]+:[^@]+@)/, '$1<credentials>') 
-      : connectionUri
-  );
-
   try {
-    await mongoose.connect(connectionUri);
-    console.log('✅ MongoDB Connected');
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (err) {
-    console.error('❌ Connection error:', err.message);
+    console.error(`Error: ${err.message}`);
     process.exit(1);
   }
 };
