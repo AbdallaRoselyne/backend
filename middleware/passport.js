@@ -1,35 +1,46 @@
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 
 passport.use(
-  new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-    if (!email.endsWith('@prodesign.mu')) {
-      return done(null, false, { message: 'Access restricted to @prodesign.mu users' });
-    }
-    try {
-      let user = await User.findOne({ email });
-
-      // If user doesn't exist, create a new user
-      if (!user) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const role = email === "farahnaz.sairally@prodesign.mu" || email === "planner@prodesign.mu" ? "admin" : "user";
-        user = new User({ email, password: hashedPassword, role });
-        await user.save();
+  new LocalStrategy(
+    { usernameField: "email" },
+    async (email, password, done) => {
+      // Domain restriction
+      if (!email.endsWith("@prodesign.mu")) {
+        return done(null, false, {
+          message: "Access restricted to @prodesign.mu users",
+        });
       }
 
-      // Check password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return done(null, false, { message: 'Invalid email or password' });
-      }
+      try {
+        let user = await User.findOne({ email });
 
-      return done(null, user);
-    } catch (error) {
-      return done(error);
+        // Auto-create user if not exists
+        if (!user) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          const role =
+            email === "farahnaz.sairally@prodesign.mu" ||
+            email === "planner@prodesign.mu"
+              ? "admin"
+              : "user";
+          user = new User({ email, password: hashedPassword, role });
+          await user.save();
+        }
+
+        // Password verification
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return done(null, false, { message: "Invalid email or password" });
+        }
+
+        return done(null, user);
+      } catch (error) {
+        return done(error);
+      }
     }
-  })
+  )
 );
 
 passport.serializeUser((user, done) => {
