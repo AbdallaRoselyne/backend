@@ -8,10 +8,10 @@ const MemberSchema = new mongoose.Schema(
     discipline: { type: String, required: true },
     department: {
       type: String,
-      enum: ["LEED", "BIM", "MEP"],
+      enum: ["LEED", "BIM", "MEP", "ADMIN"],
       required: true,
     },
-    billableRate: { type: Number, required: true }, // Stored in Mauritian Rupees (MUR)
+    billableRate: { type: Number, required: true },
   },
   { timestamps: true }
 );
