@@ -5,7 +5,7 @@ const requestSchema = new mongoose.Schema({
   email: { type: String, required: true },
   Task: { type: String, required: true },
   hours: { type: Number, required: true },
-  projectCode: { type: String, required: true },
+  projectCode: { type: String, default: "" }, 
   project: { type: String, required: true },
   requester: { type: String, required: true },
   department: { type: String, required: true },
@@ -15,10 +15,11 @@ const requestSchema = new mongoose.Schema({
     enum: ["Pending", "Approved", "Rejected"],
     default: "Pending",
   },
-  approvedHours: { type: Number, default: 0 }, // To store approved hours
-  timeSlot: { type: String, default: "" }, // To store approval time slot
-  comment: { type: String, default: "" }, // To store rejection comment
+  approvedHours: { type: Number, default: 0 },
+  timeSlot: { type: String, default: "" },
+  comment: { type: String, default: "" },
   date: { type: Date, default: Date.now },
+  isCustomProject: { type: Boolean, default: false }, 
 });
 
 module.exports = mongoose.model("Request", requestSchema);
