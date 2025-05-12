@@ -4,12 +4,15 @@ const Member = require("../models/Member");
 
 // Add a new member
 router.post("/", async (req, res) => {
-  const { name, email, jobTitle, discipline, department, billableRate } = req.body;
+  const { name, email, jobTitle, discipline, department, billableRate } =
+    req.body;
 
   // Validate email domain
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@prodesign\.mu$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Email must be a @prodesign.mu address." });
+    return res
+      .status(400)
+      .json({ message: "Please enteer a valid email address" });
   }
 
   // Validate other fields
@@ -18,7 +21,14 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const newMember = new Member({ name, email, jobTitle, discipline, department, billableRate });
+    const newMember = new Member({
+      name,
+      email,
+      jobTitle,
+      discipline,
+      department,
+      billableRate,
+    });
     const savedMember = await newMember.save();
     res.status(201).json(savedMember);
   } catch (error) {
@@ -39,12 +49,15 @@ router.get("/", async (req, res) => {
 // Update a member
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, email, jobTitle, discipline, department, billableRate } = req.body;
+  const { name, email, jobTitle, discipline, department, billableRate } =
+    req.body;
 
   // Validate email domain
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@prodesign\.mu$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (email && !emailRegex.test(email)) {
-    return res.status(400).json({ message: "Email must be a @prodesign.mu address." });
+    return res
+      .status(400)
+      .json({ message: "Please enteer a valid email address" });
   }
 
   try {
